@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform, AnimatePresence, useSpring } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Menu,
   X,
@@ -8,7 +8,6 @@ import {
   MapPin,
   Clock,
   Star,
-  ChevronDown,
   Utensils,
   Flame,
   Award,
@@ -22,6 +21,24 @@ import {
   MessageCircle,
   Mail,
   ChefHat,
+  Search,
+  Leaf,
+  Drumstick,
+  Crown,
+  Zap,
+  Globe,
+  QrCode,
+  MapPinned,
+  Send,
+  ShieldCheck,
+  Rocket,
+  Share2,
+  CalendarCheck,
+  Smartphone,
+  Server,
+  LifeBuoy,
+  Search as SearchIcon,
+  Link2,
 } from "lucide-react";
 
 import heroBiryani from "@/assets/hero-biryani.jpg";
@@ -80,11 +97,6 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 40 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } },
-};
-
 function useCounter(target: number, active: boolean, duration = 2000) {
   const [value, setValue] = useState(0);
   useEffect(() => {
@@ -108,11 +120,21 @@ function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showTop, setShowTop] = useState(false);
   const [mouse, setMouse] = useState({ x: -200, y: -200 });
+  const [loading, setLoading] = useState(true);
+  const [lightbox, setLightbox] = useState<number | null>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress: pageProgress } = useScroll();
+  const progressX = useSpring(pageProgress, { stiffness: 120, damping: 24, mass: 0.3 });
 
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 1600);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {
@@ -134,11 +156,59 @@ function Index() {
     { href: "#menu", label: "Menu" },
     { href: "#gallery", label: "Gallery" },
     { href: "#catering", label: "Catering" },
+    { href: "#business", label: "Services" },
     { href: "#contact", label: "Contact" },
   ];
 
+  const headlineWords = ["Experience", "Authentic", "Hyderabadi", "Flavours"];
+
   return (
     <div className="relative min-h-screen text-foreground overflow-x-hidden">
+      {/* LOADING SCREEN */}
+      <AnimatePresence>
+        {loading && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.7 } }}
+            className="fixed inset-0 z-[100] grid place-items-center bg-ink"
+          >
+            <div className="flex flex-col items-center gap-6">
+              <motion.div
+                initial={{ scale: 0.6, opacity: 0, rotate: -20 }}
+                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                className="relative"
+              >
+                <div className="absolute inset-0 blur-2xl bg-gold/40 rounded-full" />
+                <ChefHat className="relative h-16 w-16 text-gold" />
+              </motion.div>
+              <motion.span
+                initial={{ letterSpacing: "0.05em", opacity: 0 }}
+                animate={{ letterSpacing: "0.35em", opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+                className="font-display text-3xl text-gold-gradient uppercase"
+              >
+                Ustaads
+              </motion.span>
+              <div className="h-[2px] w-40 overflow-hidden bg-white/10 rounded-full">
+                <motion.div
+                  initial={{ x: "-100%" }}
+                  animate={{ x: "100%" }}
+                  transition={{ duration: 1.4, ease: "easeInOut", repeat: Infinity }}
+                  className="h-full w-1/2 bg-gradient-to-r from-transparent via-gold to-transparent"
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* SCROLL PROGRESS BAR */}
+      <motion.div
+        style={{ scaleX: progressX }}
+        className="fixed top-0 left-0 right-0 z-[60] h-[3px] origin-left bg-gradient-to-r from-maroon via-gold to-gold-soft"
+      />
+
       {/* Mouse glow */}
       <div
         className="pointer-events-none fixed z-[1] hidden md:block h-[500px] w-[500px] rounded-full opacity-40 blur-3xl transition-transform duration-300"
@@ -153,7 +223,7 @@ function Index() {
       <motion.nav
         initial={{ y: -80 }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        transition={{ duration: 0.6, ease: "easeOut", delay: 1.4 }}
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
           scrolled ? "glass-strong py-3" : "bg-transparent py-5"
         }`}
@@ -167,12 +237,12 @@ function Index() {
             </div>
           </a>
 
-          <div className="hidden lg:flex items-center gap-9">
+          <div className="hidden lg:flex items-center gap-7">
             {navLinks.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
-                className="group relative text-sm uppercase tracking-widest text-foreground/80 hover:text-gold transition-colors"
+                className="group relative text-xs uppercase tracking-widest text-foreground/80 hover:text-gold transition-colors"
               >
                 {l.label}
                 <span className="absolute -bottom-1 left-0 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
@@ -184,11 +254,7 @@ function Index() {
             Reserve
           </a>
 
-          <button
-            className="lg:hidden text-gold p-2"
-            onClick={() => setMenuOpen((o) => !o)}
-            aria-label="Menu"
-          >
+          <button className="lg:hidden text-gold p-2" onClick={() => setMenuOpen((o) => !o)} aria-label="Menu">
             {menuOpen ? <X size={26} /> : <Menu size={26} />}
           </button>
         </div>
@@ -226,10 +292,7 @@ function Index() {
 
       {/* HERO */}
       <section id="home" ref={heroRef} className="relative h-[100svh] min-h-[640px] w-full overflow-hidden">
-        <motion.div
-          style={{ y: heroY, opacity: heroOpacity }}
-          className="absolute inset-0"
-        >
+        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0">
           <img
             src={heroBiryani}
             alt="Hyderabadi Chicken Dum Biryani"
@@ -242,7 +305,7 @@ function Index() {
         </motion.div>
 
         {/* floating spice particles */}
-        {[...Array(14)].map((_, i) => (
+        {[...Array(18)].map((_, i) => (
           <span
             key={i}
             className="animate-float-particle absolute rounded-full bg-gold/60 blur-[1px]"
@@ -258,7 +321,7 @@ function Index() {
         ))}
 
         {/* steam */}
-        <div className="pointer-events-none absolute left-1/2 top-[50%] -translate-x-1/2 flex gap-6 opacity-60">
+        <div className="pointer-events-none absolute left-1/2 top-[55%] -translate-x-1/2 flex gap-6 opacity-60">
           {[0, 1, 2].map((i) => (
             <span
               key={i}
@@ -272,54 +335,64 @@ function Index() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.2 }}
-            className="mb-4 inline-flex items-center gap-3 rounded-full glass px-5 py-2 text-xs uppercase tracking-[0.35em] text-gold-soft"
+            transition={{ duration: 0.9, delay: 1.6 }}
+            className="mb-6 inline-flex items-center gap-3 rounded-full glass px-5 py-2 text-xs uppercase tracking-[0.35em] text-gold-soft"
           >
             <Sparkles size={14} /> Since 2020 · Hyderabad
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="max-w-5xl font-display text-5xl md:text-7xl lg:text-8xl leading-[1.05] text-balance"
-          >
-            Authentic Hyderabadi <br />
-            <span className="text-gold-gradient italic">Flavours</span>, Crafted with Tradition
-          </motion.h1>
+          {/* Word-by-word headline */}
+          <h1 className="max-w-5xl font-display text-5xl md:text-7xl lg:text-8xl leading-[1.05] text-balance">
+            {headlineWords.map((w, i) => (
+              <motion.span
+                key={w}
+                initial={{ opacity: 0, y: 60, filter: "blur(12px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.9, delay: 1.7 + i * 0.15, ease: [0.22, 1, 0.36, 1] }}
+                className={`inline-block mr-3 ${w === "Flavours" ? "text-gold-gradient italic" : ""}`}
+              >
+                {w}
+              </motion.span>
+            ))}
+          </h1>
 
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.55 }}
+            transition={{ duration: 1, delay: 2.5 }}
             className="mt-6 max-w-2xl text-base md:text-lg text-foreground/75 leading-relaxed"
           >
-            Experience rich Dum Biryani, charcoal kebabs, Mughlai curries and authentic
-            Hyderabadi desserts — slow-cooked over generations of mastery.
+            Traditional Dum Biryani, Charcoal Kebabs, Rich Mughlai Curries & Premium Catering Services.
           </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.75, type: "spring" }}
-            className="mt-10 flex flex-wrap items-center justify-center gap-4"
-          >
-            <a href="#menu" className="btn-gold rounded-full px-8 py-3.5 font-semibold tracking-wide">
-              View Menu
-            </a>
-            <a href="#contact" className="btn-outline-gold rounded-full px-8 py-3.5 font-semibold tracking-wide">
-              Reserve Table
-            </a>
-            <a href="#menu" className="btn-outline-gold rounded-full px-8 py-3.5 font-semibold tracking-wide">
-              Order Online
-            </a>
-          </motion.div>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            {[
+              { href: "#menu", label: "Order Online", cls: "btn-gold" },
+              { href: "#contact", label: "Reserve Table", cls: "btn-outline-gold" },
+              { href: "#menu", label: "View Menu", cls: "btn-outline-gold" },
+            ].map((b, i) => (
+              <motion.a
+                key={b.label}
+                href={b.href}
+                initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.7, delay: 2.7 + i * 0.15, type: "spring", stiffness: 120 }}
+                whileHover={{ y: -3 }}
+                className={`${b.cls} rounded-full px-8 py-3.5 font-semibold tracking-wide`}
+              >
+                {b.label}
+              </motion.a>
+            ))}
+          </div>
 
           <motion.a
             href="#about"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.4 }}
+            animate={{ opacity: 1, y: [0, 8, 0] }}
+            transition={{
+              opacity: { delay: 3.4, duration: 0.8 },
+              y: { delay: 3.4, duration: 1.8, repeat: Infinity, ease: "easeInOut" },
+            }}
             className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gold-soft/70"
           >
             <span className="text-[10px] uppercase tracking-[0.4em]">Scroll</span>
@@ -374,8 +447,7 @@ function Index() {
           >
             <Eyebrow>Our Story</Eyebrow>
             <h2 className="mt-4 text-4xl md:text-5xl leading-tight">
-              A legacy of <span className="text-gold-gradient italic">Nizami</span> flavours,
-              perfected over years.
+              A legacy of <span className="text-gold-gradient italic">Nizami</span> flavours, perfected over years.
             </h2>
             <p className="mt-6 text-foreground/70 leading-relaxed">
               At Ustaads, every grain of basmati is sealed with saffron and slow-cooked over
@@ -415,14 +487,7 @@ function Index() {
       <CounterSection />
 
       {/* MENU */}
-      <Section id="menu">
-        <Heading eyebrow="Signature Menu" title="Crafted for the connoisseur" />
-        <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {MENU.map((item, i) => (
-            <FoodCard key={item.name} item={item} index={i} />
-          ))}
-        </div>
-      </Section>
+      <MenuSection />
 
       {/* WHY */}
       <Section id="why">
@@ -452,13 +517,14 @@ function Index() {
         <Heading eyebrow="Gallery" title="A feast for every sense" />
         <div className="mt-14 columns-1 sm:columns-2 lg:columns-3 gap-5 [column-fill:_balance]">
           {GALLERY.map((g, i) => (
-            <motion.div
-              key={g.src}
+            <motion.button
+              key={g.src + i}
+              onClick={() => setLightbox(i)}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ delay: (i % 3) * 0.1, duration: 0.7 }}
-              className="mb-5 break-inside-avoid group relative overflow-hidden rounded-3xl border border-white/5"
+              className="mb-5 break-inside-avoid group relative overflow-hidden rounded-3xl border border-white/5 w-full block text-left cursor-pointer"
             >
               <img
                 src={g.src}
@@ -473,10 +539,58 @@ function Index() {
                   {g.alt}
                 </p>
               </div>
-            </motion.div>
+            </motion.button>
           ))}
         </div>
       </Section>
+
+      {/* LIGHTBOX */}
+      <AnimatePresence>
+        {lightbox !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setLightbox(null)}
+            className="fixed inset-0 z-[90] grid place-items-center bg-ink/95 backdrop-blur-xl p-6 cursor-zoom-out"
+          >
+            <motion.img
+              key={lightbox}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              src={GALLERY[lightbox].src}
+              alt={GALLERY[lightbox].alt}
+              className="max-h-[85vh] max-w-[92vw] rounded-2xl border border-gold/30 shadow-[var(--shadow-elevated)] object-contain"
+            />
+            <button
+              onClick={(e) => { e.stopPropagation(); setLightbox(null); }}
+              className="absolute top-6 right-6 grid h-11 w-11 place-items-center rounded-full glass-strong text-gold hover:bg-gold hover:text-ink transition"
+              aria-label="Close"
+            >
+              <X size={20} />
+            </button>
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">
+              <button
+                onClick={(e) => { e.stopPropagation(); setLightbox((v) => (v! - 1 + GALLERY.length) % GALLERY.length); }}
+                className="glass-strong rounded-full px-4 py-2 text-xs uppercase tracking-widest text-gold"
+              >
+                Prev
+              </button>
+              <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+                {lightbox + 1} / {GALLERY.length}
+              </span>
+              <button
+                onClick={(e) => { e.stopPropagation(); setLightbox((v) => (v! + 1) % GALLERY.length); }}
+                className="glass-strong rounded-full px-4 py-2 text-xs uppercase tracking-widest text-gold"
+              >
+                Next
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* TESTIMONIALS */}
       <TestimonialsSection />
@@ -543,6 +657,34 @@ function Index() {
         </div>
       </Section>
 
+      {/* BUSINESS FEATURES */}
+      <Section id="business">
+        <Heading eyebrow="For Restaurant Owners" title="Everything Your Business Needs Online" />
+        <p className="mt-4 text-center max-w-2xl mx-auto text-foreground/60">
+          A complete digital presence built for restaurants — beautifully designed, fast to load, and ready to convert diners.
+        </p>
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {BUSINESS_FEATURES.map((f, i) => (
+            <motion.div
+              key={f.t}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ delay: (i % 4) * 0.08, duration: 0.7 }}
+              className="group relative rounded-3xl p-[1px] bg-gradient-to-br from-gold/40 via-maroon/30 to-transparent hover:from-gold/70 hover:to-gold/20 transition-all"
+            >
+              <div className="glass rounded-3xl p-6 h-full flex flex-col gap-3 hover:-translate-y-1 transition-transform duration-500">
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-gold/30 to-maroon/30 text-gold group-hover:scale-110 transition-transform">
+                  <f.icon size={22} />
+                </div>
+                <h3 className="text-xl leading-tight">{f.t}</h3>
+                <p className="text-xs text-foreground/60 leading-relaxed">{f.d}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </Section>
+
       {/* CONTACT */}
       <Section id="contact">
         <Heading eyebrow="Visit Us" title="Reserve your table" />
@@ -570,6 +712,14 @@ function Index() {
                 </div>
               </div>
             ))}
+            <div className="flex gap-3 pt-2">
+              <a href="tel:+919063878223" className="btn-gold rounded-full px-5 py-2.5 text-xs font-semibold uppercase tracking-widest inline-flex items-center gap-2">
+                <Phone size={14} /> Call Now
+              </a>
+              <a href="https://wa.me/919063878223" className="btn-outline-gold rounded-full px-5 py-2.5 text-xs font-semibold uppercase tracking-widest inline-flex items-center gap-2">
+                <MessageCircle size={14} /> WhatsApp
+              </a>
+            </div>
             <div className="section-divider my-2" />
             <div className="rounded-2xl overflow-hidden border border-white/10 h-56">
               <iframe
@@ -618,6 +768,37 @@ function Index() {
             d="M0,30 C300,60 600,0 900,30 C1050,45 1150,20 1200,30 L1200,60 L0,60 Z"
           />
         </svg>
+
+        {/* Newsletter */}
+        <div className="mx-auto max-w-7xl px-5 md:px-8 pt-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="glass-strong rounded-3xl p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6"
+          >
+            <div>
+              <div className="font-display text-3xl text-gold-gradient">Join the Ustaads Circle</div>
+              <p className="mt-2 text-sm text-foreground/60">Exclusive offers, chef's specials & event invites — straight to your inbox.</p>
+            </div>
+            <form
+              onSubmit={(e) => { e.preventDefault(); alert("Subscribed! Aadab from Ustaads."); }}
+              className="flex w-full md:w-auto items-center gap-3"
+            >
+              <input
+                type="email"
+                required
+                placeholder="your@email.com"
+                className="flex-1 md:w-72 rounded-full bg-white/5 border border-white/10 px-5 py-3 text-sm focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30 transition"
+              />
+              <button className="btn-gold rounded-full px-6 py-3 text-sm font-semibold inline-flex items-center gap-2">
+                <Send size={14} /> Subscribe
+              </button>
+            </form>
+          </motion.div>
+        </div>
+
         <div className="mx-auto max-w-7xl px-5 md:px-8 py-16 grid gap-10 md:grid-cols-4">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2">
@@ -634,6 +815,7 @@ function Index() {
                   key={i}
                   href="#"
                   className="grid h-10 w-10 place-items-center rounded-full glass hover:bg-gold/20 hover:text-gold hover:-translate-y-1 transition"
+                  aria-label="Social link"
                 >
                   <Icon size={16} />
                 </a>
@@ -644,7 +826,7 @@ function Index() {
             <div className="font-display text-lg text-gold-soft mb-4">Quick Links</div>
             <ul className="space-y-2 text-sm text-foreground/70">
               {navLinks.map((l) => (
-                <li key={l.href}><a href={l.href} className="hover:text-gold">{l.label}</a></li>
+                <li key={l.href}><a href={l.href} className="hover:text-gold transition-colors">{l.label}</a></li>
               ))}
             </ul>
           </div>
@@ -654,12 +836,15 @@ function Index() {
               <li>+91 90638 78223</li>
               <li>Himayat Sagar Road</li>
               <li>Hyderabad — 500075</li>
-              <li className="pt-2"><a href="#" className="hover:text-gold">Privacy Policy</a></li>
+              <li className="pt-2 flex flex-wrap gap-x-3 gap-y-1">
+                <a href="#" className="hover:text-gold">Privacy Policy</a>
+                <a href="#" className="hover:text-gold">Terms &amp; Conditions</a>
+              </li>
             </ul>
           </div>
         </div>
         <div className="border-t border-white/5 py-5 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Ustaads · Best Hyderabadi Restaurant & Caterers
+          © {new Date().getFullYear()} Ustaads · Best Hyderabadi Restaurant &amp; Caterers
         </div>
       </footer>
 
@@ -762,14 +947,79 @@ function Field({
   );
 }
 
+function MenuSection() {
+  const [cat, setCat] = useState<string>("All");
+  const [query, setQuery] = useState("");
+
+  const categories = useMemo(() => ["All", ...Array.from(new Set(MENU.map((m) => m.cat)))], []);
+  const filtered = useMemo(
+    () =>
+      MENU.filter(
+        (m) =>
+          (cat === "All" || m.cat === cat) &&
+          (query.trim() === "" || m.name.toLowerCase().includes(query.toLowerCase())),
+      ),
+    [cat, query],
+  );
+
+  return (
+    <Section id="menu">
+      <Heading eyebrow="Signature Menu" title="Crafted for the connoisseur" />
+
+      <div className="mt-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+        <div className="flex flex-wrap gap-2">
+          {categories.map((c) => (
+            <button
+              key={c}
+              onClick={() => setCat(c)}
+              className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest transition-all ${
+                cat === c
+                  ? "bg-gradient-to-r from-gold to-gold-soft text-ink font-semibold shadow-[var(--shadow-gold)]"
+                  : "border border-gold/30 bg-gold/5 text-gold-soft hover:bg-gold/10"
+              }`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+        <div className="relative w-full md:w-72">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gold/70" size={16} />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search dishes..."
+            className="w-full rounded-full bg-white/5 border border-white/10 pl-11 pr-4 py-2.5 text-sm focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30 transition"
+          />
+        </div>
+      </div>
+
+      <motion.div layout className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <AnimatePresence mode="popLayout">
+          {filtered.map((item, i) => (
+            <FoodCard key={item.name} item={item} index={i} />
+          ))}
+        </AnimatePresence>
+      </motion.div>
+
+      {filtered.length === 0 && (
+        <div className="mt-16 text-center text-foreground/50 text-sm">
+          No dishes match your search — try another word.
+        </div>
+      )}
+    </Section>
+  );
+}
+
 function FoodCard({ item, index }: { item: (typeof MENU)[number]; index: number }) {
   return (
     <motion.article
+      layout
       initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ delay: (index % 3) * 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative rounded-3xl overflow-hidden glass border border-white/5 hover:border-gold/40 transition-all duration-500 hover:-translate-y-2 hover:shadow-[var(--shadow-gold)]"
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20, scale: 0.95 }}
+      transition={{ delay: (index % 3) * 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -8 }}
+      className="group relative rounded-3xl overflow-hidden glass border border-white/5 hover:border-gold/40 transition-all duration-500 hover:shadow-[var(--shadow-gold)]"
     >
       <div className="relative h-64 overflow-hidden">
         <img
@@ -779,26 +1029,74 @@ function FoodCard({ item, index }: { item: (typeof MENU)[number]; index: number 
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
-        <span className="absolute top-4 left-4 rounded-full glass-strong px-3 py-1 text-[10px] uppercase tracking-widest text-gold">
-          {item.cat}
-        </span>
+
+        {/* Top-left stack: category + veg indicator */}
+        <div className="absolute top-4 left-4 flex flex-col gap-2 items-start">
+          <span className="rounded-full glass-strong px-3 py-1 text-[10px] uppercase tracking-widest text-gold">
+            {item.cat}
+          </span>
+          <span
+            className={`grid h-6 w-6 place-items-center rounded-sm border ${
+              item.veg ? "border-green-500/80 text-green-400" : "border-red-500/80 text-red-400"
+            } bg-ink/70`}
+            aria-label={item.veg ? "Vegetarian" : "Non-vegetarian"}
+          >
+            {item.veg ? <Leaf size={11} /> : <Drumstick size={11} />}
+          </span>
+        </div>
+
+        {/* Top-right: price */}
         <span className="absolute top-4 right-4 rounded-full bg-gold text-ink px-3 py-1 text-sm font-bold font-display">
           {item.price}
         </span>
+
+        {/* Bottom-left badges */}
+        <div className="absolute bottom-4 left-4 flex flex-wrap gap-2">
+          {item.bestseller && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-maroon to-maroon-deep text-white px-3 py-1 text-[10px] uppercase tracking-widest font-semibold shadow-lg">
+              <Crown size={10} /> Bestseller
+            </span>
+          )}
+          {item.chefSpecial && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-gold to-gold-soft text-ink px-3 py-1 text-[10px] uppercase tracking-widest font-semibold">
+              <ChefHat size={10} /> Chef's Special
+            </span>
+          )}
+        </div>
       </div>
       <div className="p-6">
-        <h3 className="text-2xl">{item.name}</h3>
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="text-2xl leading-tight">{item.name}</h3>
+          <SpiceLevel level={item.spice} />
+        </div>
         <p className="mt-2 text-sm text-foreground/60 leading-relaxed line-clamp-2">{item.desc}</p>
         <div className="mt-5 flex items-center justify-between">
           <div className="flex gap-0.5 text-gold">
             {[...Array(5)].map((_, i) => <Star key={i} size={13} fill="currentColor" />)}
           </div>
-          <button className="btn-gold rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-widest">
-            Order Now
-          </button>
+          <a
+            href="https://wa.me/919063878223"
+            className="btn-gold rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-widest inline-flex items-center gap-1.5"
+          >
+            <Zap size={12} /> Quick Order
+          </a>
         </div>
       </div>
     </motion.article>
+  );
+}
+
+function SpiceLevel({ level }: { level: number }) {
+  return (
+    <div className="flex items-center gap-0.5 shrink-0" aria-label={`Spice level ${level} of 3`}>
+      {[1, 2, 3].map((i) => (
+        <Flame
+          key={i}
+          size={13}
+          className={i <= level ? "text-maroon fill-maroon" : "text-white/15"}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -850,6 +1148,19 @@ function TestimonialsSection() {
   return (
     <Section id="reviews">
       <Heading eyebrow="Guest Stories" title="Loved by 10,000+ diners" />
+
+      {/* Rating summary */}
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-center">
+        <div className="glass-strong rounded-2xl px-6 py-4">
+          <div className="font-display text-4xl text-gold-gradient">4.8★</div>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mt-1">Google Rating</div>
+        </div>
+        <div className="glass-strong rounded-2xl px-6 py-4">
+          <div className="font-display text-4xl text-gold-gradient">1100+</div>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mt-1">Google Reviews</div>
+        </div>
+      </div>
+
       <div className="mt-14 relative max-w-3xl mx-auto h-64">
         <AnimatePresence mode="wait">
           <motion.blockquote
@@ -875,6 +1186,7 @@ function TestimonialsSection() {
           <button
             key={k}
             onClick={() => setI(k)}
+            aria-label={`Testimonial ${k + 1}`}
             className={`h-1.5 rounded-full transition-all ${k === i ? "w-10 bg-gold" : "w-4 bg-white/20"}`}
           />
         ))}
@@ -886,15 +1198,15 @@ function TestimonialsSection() {
 /* ---------------- Data ---------------- */
 
 const MENU = [
-  { name: "Chicken Dum Biryani", cat: "Biryani", price: "₹225", img: heroBiryani, desc: "Slow-cooked basmati, tender chicken, saffron and secret spices, sealed with dough." },
-  { name: "Mutton Biryani", cat: "Biryani", price: "₹350", img: muttonBiryani, desc: "Premium mutton dum-cooked with aromatic long-grain rice — a Hyderabadi classic." },
-  { name: "Angara Kebab", cat: "Starter", price: "₹280", img: kebabs, desc: "Charcoal-grilled skewers, smoky and succulent with a hint of yoghurt marinade." },
-  { name: "Chicken 65", cat: "Starter", price: "₹240", img: chicken65, desc: "Crispy, spicy, tangy — Hyderabad's most iconic bar bite, done right." },
-  { name: "Butter Chicken", cat: "Main", price: "₹320", img: butterChicken, desc: "Silken tomato-cream gravy, tandoor-charred chicken, finished with kasuri methi." },
-  { name: "Paneer Tikka", cat: "Starter", price: "₹260", img: paneerTikka, desc: "Marinated cottage cheese, chargrilled to smoky perfection with bell peppers." },
-  { name: "Veg Dum Biryani", cat: "Biryani", price: "₹200", img: heroBiryani, desc: "Fragrant vegetables and basmati, layered and dum-sealed — vegetarian royalty." },
-  { name: "Murgh Musallam", cat: "Main", price: "₹420", img: butterChicken, desc: "Whole chicken slow-braised in Mughlai spices — a royal centrepiece." },
-  { name: "Qubani Ka Meetha", cat: "Dessert", price: "₹160", img: qubani, desc: "Traditional Hyderabadi apricot dessert with fresh cream — heritage on a plate." },
+  { name: "Chicken Dum Biryani", cat: "Biryani", price: "₹225", img: heroBiryani, desc: "Slow-cooked basmati, tender chicken, saffron and secret spices, sealed with dough.", veg: false, spice: 2, bestseller: true, chefSpecial: true },
+  { name: "Mutton Biryani", cat: "Biryani", price: "₹350", img: muttonBiryani, desc: "Premium mutton dum-cooked with aromatic long-grain rice — a Hyderabadi classic.", veg: false, spice: 3, bestseller: true, chefSpecial: false },
+  { name: "Angara Kebab", cat: "Starter", price: "₹280", img: kebabs, desc: "Charcoal-grilled skewers, smoky and succulent with a hint of yoghurt marinade.", veg: false, spice: 2, bestseller: false, chefSpecial: true },
+  { name: "Chicken 65", cat: "Starter", price: "₹240", img: chicken65, desc: "Crispy, spicy, tangy — Hyderabad's most iconic bar bite, done right.", veg: false, spice: 3, bestseller: true, chefSpecial: false },
+  { name: "Butter Chicken", cat: "Main", price: "₹320", img: butterChicken, desc: "Silken tomato-cream gravy, tandoor-charred chicken, finished with kasuri methi.", veg: false, spice: 1, bestseller: false, chefSpecial: false },
+  { name: "Paneer Tikka", cat: "Starter", price: "₹260", img: paneerTikka, desc: "Marinated cottage cheese, chargrilled to smoky perfection with bell peppers.", veg: true, spice: 2, bestseller: false, chefSpecial: false },
+  { name: "Veg Dum Biryani", cat: "Biryani", price: "₹200", img: heroBiryani, desc: "Fragrant vegetables and basmati, layered and dum-sealed — vegetarian royalty.", veg: true, spice: 2, bestseller: false, chefSpecial: false },
+  { name: "Murgh Musallam", cat: "Main", price: "₹420", img: butterChicken, desc: "Whole chicken slow-braised in Mughlai spices — a royal centrepiece.", veg: false, spice: 2, bestseller: false, chefSpecial: true },
+  { name: "Qubani Ka Meetha", cat: "Dessert", price: "₹160", img: qubani, desc: "Traditional Hyderabadi apricot dessert with fresh cream — heritage on a plate.", veg: true, spice: 0, bestseller: true, chefSpecial: false },
 ];
 
 const WHY = [
@@ -923,4 +1235,21 @@ const TESTIMONIALS = [
   { q: "Excellent taste and amazing service. Catered our wedding for 800 guests flawlessly.", n: "Priya K." },
   { q: "Highly recommended for family dining. The kebabs are unreal — proper charcoal work.", n: "Aditya M." },
   { q: "Ordered for a corporate event of 200 people. On time, hot, and every plate was empty.", n: "Neha R." },
+];
+
+const BUSINESS_FEATURES = [
+  { icon: Globe, t: "Premium Responsive Website", d: "A luxury digital storefront that looks stunning on every device." },
+  { icon: QrCode, t: "Digital QR Code Menu", d: "Contactless menu access — scan, browse, order in seconds." },
+  { icon: MapPinned, t: "Google Maps Integration", d: "One-tap directions bring more diners through your door." },
+  { icon: MessageCircle, t: "WhatsApp Ordering", d: "Direct chat orders with pre-filled messages, zero friction." },
+  { icon: Send, t: "Online Contact Form", d: "Enquiries land in your inbox — reservations and events handled." },
+  { icon: SearchIcon, t: "Basic SEO Optimization", d: "Structured data and meta tags for local search visibility." },
+  { icon: Link2, t: "Custom Domain Setup", d: "Your own branded domain — professional, memorable, trusted." },
+  { icon: Server, t: "Hosting Setup", d: "Fast, secure, globally distributed hosting configured for you." },
+  { icon: LifeBuoy, t: "One Year Technical Support", d: "Bug fixes, tweaks and updates — we've got your back." },
+  { icon: Smartphone, t: "Mobile Friendly Design", d: "Pixel-perfect experience for every screen size and orientation." },
+  { icon: Rocket, t: "Fast Loading Website", d: "Optimised images, lazy loading, blazing Lighthouse scores." },
+  { icon: Share2, t: "Social Media Integration", d: "Instagram, Facebook and more — beautifully linked throughout." },
+  { icon: CalendarCheck, t: "Online Table Reservation", d: "Guests book instantly — you get organised bookings." },
+  { icon: ShieldCheck, t: "Google Review Integration", d: "Showcase your ratings and build instant credibility." },
 ];
