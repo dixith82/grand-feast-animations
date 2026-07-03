@@ -731,15 +731,33 @@ function Index() {
               </a>
             </div>
             <div className="section-divider my-2" />
-            <div className="rounded-2xl overflow-hidden border border-white/10 h-56">
+            <motion.a
+              href="https://www.google.com/maps?q=Ustaads+Himayat+Sagar+Road+Hyderabad"
+              target="_blank"
+              rel="noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.6 }}
+              className="group relative block rounded-[20px] overflow-hidden border border-gold/30 shadow-[0_20px_50px_-20px_oklch(0.78_0.13_82/0.35)] hover:border-gold/60 hover:shadow-[0_25px_70px_-15px_oklch(0.78_0.13_82/0.55)] transition-all duration-500 h-60"
+              aria-label="Open in Google Maps"
+            >
               <iframe
                 title="Ustaads location"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 src="https://www.google.com/maps?q=Himayat+Sagar+Road+Hyderabad&output=embed"
-                className="h-full w-full grayscale contrast-125 opacity-90 hover:grayscale-0 transition duration-700"
+                className="h-full w-full pointer-events-none"
+                style={{ filter: "invert(0.92) hue-rotate(180deg) saturate(0.65) contrast(0.95) brightness(0.85)" }}
               />
-            </div>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-ink/40 via-transparent to-maroon-deep/30 mix-blend-multiply" />
+              <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-[radial-gradient(circle_at_50%_50%,oklch(0.78_0.13_82/0.15),transparent_60%)]" />
+              <div className="absolute bottom-3 left-3 glass-strong rounded-full px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-gold-soft flex items-center gap-1.5">
+                <MapPin size={11} /> Open in Google Maps
+              </div>
+            </motion.a>
+
           </motion.div>
 
           <motion.form
