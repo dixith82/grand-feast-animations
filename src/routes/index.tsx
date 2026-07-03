@@ -858,21 +858,44 @@ function Index() {
         </div>
       </footer>
 
-      {/* Floating actions */}
-      <a
-        href="tel:+919063878223"
-        className="fixed bottom-6 left-6 z-40 grid h-14 w-14 place-items-center rounded-full btn-gold shadow-[var(--shadow-gold)] animate-pulse-ring"
-        aria-label="Call"
+      {/* Sticky floating action bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 3.2, duration: 0.7 }}
+        className="fixed bottom-4 left-1/2 z-40 -translate-x-1/2 w-[calc(100%-1.5rem)] max-w-2xl"
       >
-        <Phone size={20} />
-      </a>
-      <a
-        href="https://wa.me/919063878223"
-        className="fixed bottom-6 right-6 z-40 grid h-14 w-14 place-items-center rounded-full bg-[oklch(0.7_0.18_150)] text-ink shadow-lg hover:scale-110 transition"
-        aria-label="WhatsApp"
-      >
-        <MessageCircle size={22} />
-      </a>
+        <div className="glass-strong flex items-center justify-between gap-1.5 rounded-full px-2 py-2 shadow-[var(--shadow-elevated)]">
+          {[
+            { href: "#contact", label: "Reserve", icon: CalendarCheck, primary: true },
+            { href: "#menu", label: "Order", icon: Utensils },
+            { href: "tel:+919063878223", label: "Call", icon: Phone },
+            { href: "https://wa.me/919063878223", label: "WhatsApp", icon: MessageCircle, wa: true },
+          ].map((b) => {
+            const Icon = b.icon;
+            return (
+              <motion.a
+                key={b.label}
+                href={b.href}
+                whileHover={{ y: -2, scale: 1.04 }}
+                whileTap={{ scale: 0.95 }}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-2 py-2.5 text-[11px] sm:text-xs font-semibold tracking-wide transition ${
+                  b.primary
+                    ? "btn-gold text-ink"
+                    : b.wa
+                      ? "bg-[oklch(0.7_0.18_150)] text-ink"
+                      : "text-gold-soft hover:bg-white/5"
+                }`}
+                aria-label={b.label}
+              >
+                <Icon size={15} />
+                <span className="hidden xs:inline sm:inline">{b.label}</span>
+              </motion.a>
+            );
+          })}
+        </div>
+      </motion.div>
+
       <AnimatePresence>
         {showTop && (
           <motion.button
@@ -887,6 +910,7 @@ function Index() {
           </motion.button>
         )}
       </AnimatePresence>
+
     </div>
   );
 }
