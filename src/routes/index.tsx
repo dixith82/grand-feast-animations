@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 
 import heroBiryani from "@/assets/hero-biryani.jpg";
+import heroVideoAsset from "@/assets/hero-video.mp4.asset.json";
 import muttonBiryani from "@/assets/mutton-biryani.jpg";
 import kebabs from "@/assets/kebabs.jpg";
 import butterChicken from "@/assets/butter-chicken.jpg";
