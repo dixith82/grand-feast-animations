@@ -375,9 +375,9 @@ function Index() {
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             {[
-              { href: "#menu", label: "Order Online", cls: "btn-gold" },
-              { href: "#contact", label: "Reserve Table", cls: "btn-outline-gold" },
-              { href: "#menu", label: "View Menu", cls: "btn-outline-gold" },
+              { href: "#contact", label: "Reserve a Table", cls: "btn-gold" },
+              { href: "#menu", label: "Order Online", cls: "btn-outline-gold" },
+              { href: "tel:+919063878223", label: "Call Now", cls: "btn-outline-gold" },
             ].map((b, i) => (
               <motion.a
                 key={b.label}
@@ -385,13 +385,15 @@ function Index() {
                 initial={{ opacity: 0, y: 30, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.7, delay: 2.7 + i * 0.15, type: "spring", stiffness: 120 }}
-                whileHover={{ y: -3 }}
-                className={`${b.cls} rounded-full px-8 py-3.5 font-semibold tracking-wide`}
+                whileHover={{ y: -4, scale: 1.03 }}
+                whileTap={{ scale: 0.96 }}
+                className={`${b.cls} rounded-full px-8 py-3.5 font-semibold tracking-wide shadow-lg`}
               >
                 {b.label}
               </motion.a>
             ))}
           </div>
+
 
           <motion.a
             href="#about"
