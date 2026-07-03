@@ -731,15 +731,33 @@ function Index() {
               </a>
             </div>
             <div className="section-divider my-2" />
-            <div className="rounded-2xl overflow-hidden border border-white/10 h-56">
+            <motion.a
+              href="https://www.google.com/maps?q=Ustaads+Himayat+Sagar+Road+Hyderabad"
+              target="_blank"
+              rel="noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.6 }}
+              className="group relative block rounded-[20px] overflow-hidden border border-gold/30 shadow-[0_20px_50px_-20px_oklch(0.78_0.13_82/0.35)] hover:border-gold/60 hover:shadow-[0_25px_70px_-15px_oklch(0.78_0.13_82/0.55)] transition-all duration-500 h-60"
+              aria-label="Open in Google Maps"
+            >
               <iframe
                 title="Ustaads location"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 src="https://www.google.com/maps?q=Himayat+Sagar+Road+Hyderabad&output=embed"
-                className="h-full w-full grayscale contrast-125 opacity-90 hover:grayscale-0 transition duration-700"
+                className="h-full w-full pointer-events-none"
+                style={{ filter: "invert(0.92) hue-rotate(180deg) saturate(0.65) contrast(0.95) brightness(0.85)" }}
               />
-            </div>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-ink/40 via-transparent to-maroon-deep/30 mix-blend-multiply" />
+              <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-[radial-gradient(circle_at_50%_50%,oklch(0.78_0.13_82/0.15),transparent_60%)]" />
+              <div className="absolute bottom-3 left-3 glass-strong rounded-full px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-gold-soft flex items-center gap-1.5">
+                <MapPin size={11} /> Open in Google Maps
+              </div>
+            </motion.a>
+
           </motion.div>
 
           <motion.form
@@ -867,8 +885,9 @@ function Index() {
       >
         <div className="glass-strong flex items-center justify-between gap-1.5 rounded-full px-2 py-2 shadow-[var(--shadow-elevated)]">
           {[
+            { href: "#top", label: "Home", icon: Sparkles },
+            { href: "#menu", label: "Menu", icon: Utensils },
             { href: "#contact", label: "Reserve", icon: CalendarCheck, primary: true },
-            { href: "#menu", label: "Order", icon: Utensils },
             { href: "tel:+919063878223", label: "Call", icon: Phone },
             { href: "https://wa.me/919063878223", label: "WhatsApp", icon: MessageCircle, wa: true },
           ].map((b) => {
@@ -877,9 +896,9 @@ function Index() {
               <motion.a
                 key={b.label}
                 href={b.href}
-                whileHover={{ y: -2, scale: 1.04 }}
-                whileTap={{ scale: 0.95 }}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-2 py-2.5 text-[11px] sm:text-xs font-semibold tracking-wide transition ${
+                whileHover={{ y: -3, scale: 1.06 }}
+                whileTap={{ scale: 0.92 }}
+                className={`relative flex flex-1 flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 rounded-full px-1.5 sm:px-3 py-2 sm:py-2.5 text-[10px] sm:text-xs font-semibold tracking-wide transition ${
                   b.primary
                     ? "btn-gold text-ink"
                     : b.wa
@@ -888,11 +907,12 @@ function Index() {
                 }`}
                 aria-label={b.label}
               >
-                <Icon size={15} />
-                <span className="hidden xs:inline sm:inline">{b.label}</span>
+                <Icon size={16} />
+                <span>{b.label}</span>
               </motion.a>
             );
           })}
+
         </div>
       </motion.div>
 
@@ -1147,13 +1167,14 @@ function CounterSection() {
   const stats = [
     { n: 10000, s: "+", l: "Happy Customers" },
     { n: 1100, s: "+", l: "Google Reviews" },
-    { n: 48, s: "★", l: "Rating", divide: 10 },
-    { n: 5, s: "+", l: "Years Experience" },
+    { n: 48, s: "★", l: "Google Rating", divide: 10 },
+    { n: 500, s: "+", l: "Catering Events" },
+    { n: 5, s: "+", l: "Years Excellence" },
   ];
 
   return (
     <div ref={ref} className="relative py-20 border-y border-white/5 bg-gradient-to-b from-transparent via-maroon-deep/20 to-transparent">
-      <div className="mx-auto max-w-7xl px-5 md:px-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8 grid grid-cols-2 md:grid-cols-5 gap-8">
         {stats.map((s, i) => <StatItem key={i} {...s} active={active} />)}
       </div>
     </div>
