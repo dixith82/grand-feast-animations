@@ -1147,8 +1147,9 @@ function CounterSection() {
   const stats = [
     { n: 10000, s: "+", l: "Happy Customers" },
     { n: 1100, s: "+", l: "Google Reviews" },
-    { n: 48, s: "★", l: "Rating", divide: 10 },
-    { n: 5, s: "+", l: "Years Experience" },
+    { n: 48, s: "★", l: "Google Rating", divide: 10 },
+    { n: 500, s: "+", l: "Catering Events" },
+    { n: 5, s: "+", l: "Years Excellence" },
   ];
 
   return (
