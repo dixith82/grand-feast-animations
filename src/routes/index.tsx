@@ -1154,7 +1154,7 @@ function CounterSection() {
 
   return (
     <div ref={ref} className="relative py-20 border-y border-white/5 bg-gradient-to-b from-transparent via-maroon-deep/20 to-transparent">
-      <div className="mx-auto max-w-7xl px-5 md:px-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8 grid grid-cols-2 md:grid-cols-5 gap-8">
         {stats.map((s, i) => <StatItem key={i} {...s} active={active} />)}
       </div>
     </div>
