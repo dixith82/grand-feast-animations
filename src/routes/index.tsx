@@ -885,8 +885,9 @@ function Index() {
       >
         <div className="glass-strong flex items-center justify-between gap-1.5 rounded-full px-2 py-2 shadow-[var(--shadow-elevated)]">
           {[
+            { href: "#top", label: "Home", icon: Sparkles },
+            { href: "#menu", label: "Menu", icon: Utensils },
             { href: "#contact", label: "Reserve", icon: CalendarCheck, primary: true },
-            { href: "#menu", label: "Order", icon: Utensils },
             { href: "tel:+919063878223", label: "Call", icon: Phone },
             { href: "https://wa.me/919063878223", label: "WhatsApp", icon: MessageCircle, wa: true },
           ].map((b) => {
@@ -895,9 +896,9 @@ function Index() {
               <motion.a
                 key={b.label}
                 href={b.href}
-                whileHover={{ y: -2, scale: 1.04 }}
-                whileTap={{ scale: 0.95 }}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-2 py-2.5 text-[11px] sm:text-xs font-semibold tracking-wide transition ${
+                whileHover={{ y: -3, scale: 1.06 }}
+                whileTap={{ scale: 0.92 }}
+                className={`relative flex flex-1 flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 rounded-full px-1.5 sm:px-3 py-2 sm:py-2.5 text-[10px] sm:text-xs font-semibold tracking-wide transition ${
                   b.primary
                     ? "btn-gold text-ink"
                     : b.wa
@@ -906,11 +907,12 @@ function Index() {
                 }`}
                 aria-label={b.label}
               >
-                <Icon size={15} />
-                <span className="hidden xs:inline sm:inline">{b.label}</span>
+                <Icon size={16} />
+                <span>{b.label}</span>
               </motion.a>
             );
           })}
+
         </div>
       </motion.div>
 
