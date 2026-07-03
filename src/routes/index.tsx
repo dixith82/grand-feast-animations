@@ -294,15 +294,21 @@ function Index() {
       {/* HERO */}
       <section id="home" ref={heroRef} className="relative h-[100svh] min-h-[640px] w-full overflow-hidden">
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0">
-          <img
-            src={heroBiryani}
-            alt="Hyderabadi Chicken Dum Biryani"
-            width={1920}
-            height={1280}
+          <video
+            src={heroVideoAsset.url}
+            poster={heroBiryani}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
             className="h-full w-full object-cover animate-kenburns"
           />
+          {/* dark overlay 45% */}
+          <div className="absolute inset-0 bg-black/45" />
           <div className="absolute inset-0" style={{ background: "var(--gradient-hero)" }} />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,oklch(0.05_0.01_30/0.7)_100%)]" />
+          {/* vignette */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,oklch(0.05_0.01_30/0.85)_100%)]" />
         </motion.div>
 
         {/* floating spice particles */}
@@ -321,16 +327,17 @@ function Index() {
           />
         ))}
 
-        {/* steam */}
-        <div className="pointer-events-none absolute left-1/2 top-[55%] -translate-x-1/2 flex gap-6 opacity-60">
-          {[0, 1, 2].map((i) => (
+        {/* steam plumes — realistic, continuous */}
+        <div className="pointer-events-none absolute inset-x-0 top-[45%] flex justify-center gap-4 md:gap-8 opacity-70">
+          {[0, 1, 2, 3, 4, 5, 6].map((i) => (
             <span
               key={i}
-              className="block h-24 w-2 rounded-full bg-white/40 blur-xl animate-steam"
-              style={{ animationDelay: `${i * 0.9}s` }}
+              className="block h-32 w-2 md:w-3 rounded-full bg-white/40 blur-2xl animate-steam"
+              style={{ animationDelay: `${i * 0.55}s`, animationDuration: `${4 + (i % 3)}s` }}
             />
           ))}
         </div>
+
 
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
           <motion.div
