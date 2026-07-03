@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 
 import heroBiryani from "@/assets/hero-biryani.jpg";
+import heroVideoAsset from "@/assets/hero-video.mp4.asset.json";
 import muttonBiryani from "@/assets/mutton-biryani.jpg";
 import kebabs from "@/assets/kebabs.jpg";
 import butterChicken from "@/assets/butter-chicken.jpg";
@@ -293,15 +294,21 @@ function Index() {
       {/* HERO */}
       <section id="home" ref={heroRef} className="relative h-[100svh] min-h-[640px] w-full overflow-hidden">
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0">
-          <img
-            src={heroBiryani}
-            alt="Hyderabadi Chicken Dum Biryani"
-            width={1920}
-            height={1280}
+          <video
+            src={heroVideoAsset.url}
+            poster={heroBiryani}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
             className="h-full w-full object-cover animate-kenburns"
           />
+          {/* dark overlay 45% */}
+          <div className="absolute inset-0 bg-black/45" />
           <div className="absolute inset-0" style={{ background: "var(--gradient-hero)" }} />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,oklch(0.05_0.01_30/0.7)_100%)]" />
+          {/* vignette */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,oklch(0.05_0.01_30/0.85)_100%)]" />
         </motion.div>
 
         {/* floating spice particles */}
@@ -320,16 +327,17 @@ function Index() {
           />
         ))}
 
-        {/* steam */}
-        <div className="pointer-events-none absolute left-1/2 top-[55%] -translate-x-1/2 flex gap-6 opacity-60">
-          {[0, 1, 2].map((i) => (
+        {/* steam plumes — realistic, continuous */}
+        <div className="pointer-events-none absolute inset-x-0 top-[45%] flex justify-center gap-4 md:gap-8 opacity-70">
+          {[0, 1, 2, 3, 4, 5, 6].map((i) => (
             <span
               key={i}
-              className="block h-24 w-2 rounded-full bg-white/40 blur-xl animate-steam"
-              style={{ animationDelay: `${i * 0.9}s` }}
+              className="block h-32 w-2 md:w-3 rounded-full bg-white/40 blur-2xl animate-steam"
+              style={{ animationDelay: `${i * 0.55}s`, animationDuration: `${4 + (i % 3)}s` }}
             />
           ))}
         </div>
+
 
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
           <motion.div
@@ -367,9 +375,9 @@ function Index() {
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             {[
-              { href: "#menu", label: "Order Online", cls: "btn-gold" },
-              { href: "#contact", label: "Reserve Table", cls: "btn-outline-gold" },
-              { href: "#menu", label: "View Menu", cls: "btn-outline-gold" },
+              { href: "#contact", label: "Reserve a Table", cls: "btn-gold" },
+              { href: "#menu", label: "Order Online", cls: "btn-outline-gold" },
+              { href: "tel:+919063878223", label: "Call Now", cls: "btn-outline-gold" },
             ].map((b, i) => (
               <motion.a
                 key={b.label}
@@ -377,13 +385,15 @@ function Index() {
                 initial={{ opacity: 0, y: 30, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.7, delay: 2.7 + i * 0.15, type: "spring", stiffness: 120 }}
-                whileHover={{ y: -3 }}
-                className={`${b.cls} rounded-full px-8 py-3.5 font-semibold tracking-wide`}
+                whileHover={{ y: -4, scale: 1.03 }}
+                whileTap={{ scale: 0.96 }}
+                className={`${b.cls} rounded-full px-8 py-3.5 font-semibold tracking-wide shadow-lg`}
               >
                 {b.label}
               </motion.a>
             ))}
           </div>
+
 
           <motion.a
             href="#about"
@@ -848,21 +858,44 @@ function Index() {
         </div>
       </footer>
 
-      {/* Floating actions */}
-      <a
-        href="tel:+919063878223"
-        className="fixed bottom-6 left-6 z-40 grid h-14 w-14 place-items-center rounded-full btn-gold shadow-[var(--shadow-gold)] animate-pulse-ring"
-        aria-label="Call"
+      {/* Sticky floating action bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 3.2, duration: 0.7 }}
+        className="fixed bottom-4 left-1/2 z-40 -translate-x-1/2 w-[calc(100%-1.5rem)] max-w-2xl"
       >
-        <Phone size={20} />
-      </a>
-      <a
-        href="https://wa.me/919063878223"
-        className="fixed bottom-6 right-6 z-40 grid h-14 w-14 place-items-center rounded-full bg-[oklch(0.7_0.18_150)] text-ink shadow-lg hover:scale-110 transition"
-        aria-label="WhatsApp"
-      >
-        <MessageCircle size={22} />
-      </a>
+        <div className="glass-strong flex items-center justify-between gap-1.5 rounded-full px-2 py-2 shadow-[var(--shadow-elevated)]">
+          {[
+            { href: "#contact", label: "Reserve", icon: CalendarCheck, primary: true },
+            { href: "#menu", label: "Order", icon: Utensils },
+            { href: "tel:+919063878223", label: "Call", icon: Phone },
+            { href: "https://wa.me/919063878223", label: "WhatsApp", icon: MessageCircle, wa: true },
+          ].map((b) => {
+            const Icon = b.icon;
+            return (
+              <motion.a
+                key={b.label}
+                href={b.href}
+                whileHover={{ y: -2, scale: 1.04 }}
+                whileTap={{ scale: 0.95 }}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-2 py-2.5 text-[11px] sm:text-xs font-semibold tracking-wide transition ${
+                  b.primary
+                    ? "btn-gold text-ink"
+                    : b.wa
+                      ? "bg-[oklch(0.7_0.18_150)] text-ink"
+                      : "text-gold-soft hover:bg-white/5"
+                }`}
+                aria-label={b.label}
+              >
+                <Icon size={15} />
+                <span className="hidden xs:inline sm:inline">{b.label}</span>
+              </motion.a>
+            );
+          })}
+        </div>
+      </motion.div>
+
       <AnimatePresence>
         {showTop && (
           <motion.button
@@ -877,6 +910,7 @@ function Index() {
           </motion.button>
         )}
       </AnimatePresence>
+
     </div>
   );
 }
