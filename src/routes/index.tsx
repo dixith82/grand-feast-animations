@@ -70,7 +70,10 @@ export const Route = createFileRoute("/")({
       { property: "og:url", content: "/" },
       { name: "twitter:image", content: heroBiryani },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [
+      { rel: "canonical", href: "/" },
+      { rel: "preload", as: "image", href: heroBiryani, fetchpriority: "high" },
+    ],
     scripts: [
       {
         type: "application/ld+json",
