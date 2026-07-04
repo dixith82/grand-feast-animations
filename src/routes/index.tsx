@@ -1403,10 +1403,30 @@ const GALLERY = [
 ];
 
 const TESTIMONIALS = [
-  { q: "Best Hyderabadi biryani in the city. The dum aroma alone is worth the visit.", n: "Rahul S." },
-  { q: "Excellent taste and amazing service. Catered our wedding for 800 guests flawlessly.", n: "Priya K." },
-  { q: "Highly recommended for family dining. The kebabs are unreal — proper charcoal work.", n: "Aditya M." },
-  { q: "Ordered for a corporate event of 200 people. On time, hot, and every plate was empty.", n: "Neha R." },
+  {
+    q: "Best Hyderabadi biryani in the city. The dum aroma alone is worth the visit.",
+    n: "Rahul S.",
+    city: "Hyderabad",
+    avatar: "https://i.pravatar.cc/160?img=15",
+  },
+  {
+    q: "Excellent taste and amazing service. Catered our wedding for 800 guests flawlessly.",
+    n: "Priya K.",
+    city: "Secunderabad",
+    avatar: "https://i.pravatar.cc/160?img=45",
+  },
+  {
+    q: "Highly recommended for family dining. The kebabs are unreal — proper charcoal work.",
+    n: "Aditya M.",
+    city: "Gachibowli",
+    avatar: "https://i.pravatar.cc/160?img=12",
+  },
+  {
+    q: "Ordered for a corporate event of 200 people. On time, hot, and every plate was empty.",
+    n: "Neha R.",
+    city: "Banjara Hills",
+    avatar: "https://i.pravatar.cc/160?img=32",
+  },
 ];
 
 const BUSINESS_FEATURES = [
