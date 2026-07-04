@@ -214,3 +214,19 @@
   height: 1px;
   background: linear-gradient(90deg, transparent, oklch(0.78 0.13 82 / 0.5), transparent);
 }
+
+/* Reduce heavy background animations on mobile & when user prefers reduced motion */
+@media (max-width: 640px) {
+  .animate-kenburns,
+  .animate-float-particle,
+  .animate-steam,
+  .animate-wave { animation: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
