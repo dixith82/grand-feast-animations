@@ -1321,13 +1321,13 @@ function TestimonialsSection() {
 const MENU = [
   { name: "Chicken Dum Biryani", cat: "Biryani", price: "₹225", img: heroBiryani, desc: "Slow-cooked basmati, tender chicken, saffron and secret spices, sealed with dough.", veg: false, spice: 2, bestseller: true, chefSpecial: true },
   { name: "Mutton Biryani", cat: "Biryani", price: "₹350", img: muttonBiryani, desc: "Premium mutton dum-cooked with aromatic long-grain rice — a Hyderabadi classic.", veg: false, spice: 3, bestseller: true, chefSpecial: false },
-  { name: "Angara Kebab", cat: "Starter", price: "₹280", img: kebabs, desc: "Charcoal-grilled skewers, smoky and succulent with a hint of yoghurt marinade.", veg: false, spice: 2, bestseller: false, chefSpecial: true },
-  { name: "Chicken 65", cat: "Starter", price: "₹240", img: chicken65, desc: "Crispy, spicy, tangy — Hyderabad's most iconic bar bite, done right.", veg: false, spice: 3, bestseller: true, chefSpecial: false },
-  { name: "Butter Chicken", cat: "Main", price: "₹320", img: butterChicken, desc: "Silken tomato-cream gravy, tandoor-charred chicken, finished with kasuri methi.", veg: false, spice: 1, bestseller: false, chefSpecial: false },
-  { name: "Paneer Tikka", cat: "Starter", price: "₹260", img: paneerTikka, desc: "Marinated cottage cheese, chargrilled to smoky perfection with bell peppers.", veg: true, spice: 2, bestseller: false, chefSpecial: false },
+  { name: "Angara Kebab", cat: "Starters", price: "₹280", img: kebabs, desc: "Charcoal-grilled skewers, smoky and succulent with a hint of yoghurt marinade.", veg: false, spice: 2, bestseller: false, chefSpecial: true },
+  { name: "Chicken 65", cat: "Starters", price: "₹240", img: chicken65, desc: "Crispy, spicy, tangy — Hyderabad's most iconic bar bite, done right.", veg: false, spice: 3, bestseller: true, chefSpecial: false },
+  { name: "Butter Chicken", cat: "Main Course", price: "₹320", img: butterChicken, desc: "Silken tomato-cream gravy, tandoor-charred chicken, finished with kasuri methi.", veg: false, spice: 1, bestseller: false, chefSpecial: false },
+  { name: "Paneer Tikka", cat: "Starters", price: "₹260", img: paneerTikka, desc: "Marinated cottage cheese, chargrilled to smoky perfection with bell peppers.", veg: true, spice: 2, bestseller: false, chefSpecial: false },
   { name: "Veg Dum Biryani", cat: "Biryani", price: "₹200", img: heroBiryani, desc: "Fragrant vegetables and basmati, layered and dum-sealed — vegetarian royalty.", veg: true, spice: 2, bestseller: false, chefSpecial: false },
-  { name: "Murgh Musallam", cat: "Main", price: "₹420", img: butterChicken, desc: "Whole chicken slow-braised in Mughlai spices — a royal centrepiece.", veg: false, spice: 2, bestseller: false, chefSpecial: true },
-  { name: "Qubani Ka Meetha", cat: "Dessert", price: "₹160", img: qubani, desc: "Traditional Hyderabadi apricot dessert with fresh cream — heritage on a plate.", veg: true, spice: 0, bestseller: true, chefSpecial: false },
+  { name: "Murgh Musallam", cat: "Main Course", price: "₹420", img: butterChicken, desc: "Whole chicken slow-braised in Mughlai spices — a royal centrepiece.", veg: false, spice: 2, bestseller: false, chefSpecial: true },
+  { name: "Qubani Ka Meetha", cat: "Desserts", price: "₹160", img: qubani, desc: "Traditional Hyderabadi apricot dessert with fresh cream — heritage on a plate.", veg: true, spice: 0, bestseller: true, chefSpecial: false },
 ];
 
 const WHY = [
