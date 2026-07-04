@@ -1267,10 +1267,13 @@ function StatItem({ n, s, l, divide, active }: { n: number; s: string; l: string
 
 function TestimonialsSection() {
   const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
   useEffect(() => {
-    const id = setInterval(() => setI((v) => (v + 1) % TESTIMONIALS.length), 5000);
+    if (paused) return;
+    const id = setInterval(() => setI((v) => (v + 1) % TESTIMONIALS.length), 5500);
     return () => clearInterval(id);
-  }, []);
+  }, [paused]);
+  const t = TESTIMONIALS[i];
   return (
     <Section id="reviews">
       <Heading eyebrow="Guest Stories" title="Loved by 10,000+ diners" />
@@ -1287,33 +1290,77 @@ function TestimonialsSection() {
         </div>
       </div>
 
-      <div className="mt-14 relative max-w-3xl mx-auto h-64">
+      <div
+        className="mt-14 relative max-w-3xl mx-auto min-h-[22rem] md:min-h-[20rem]"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
         <AnimatePresence mode="wait">
           <motion.blockquote
             key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.7 }}
-            className="glass-strong rounded-3xl p-10 text-center absolute inset-0"
+            initial={{ opacity: 0, y: 30, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -30, scale: 0.97 }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            className="glass-strong rounded-3xl p-8 md:p-10 text-center relative overflow-hidden"
           >
-            <div className="flex justify-center gap-1 text-gold mb-4">
-              {[...Array(5)].map((_, k) => <Star key={k} size={16} fill="currentColor" />)}
+            {/* subtle radial gold glow */}
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,oklch(0.78_0.13_82/0.15),transparent_60%)]" />
+
+            {/* Avatar + verified */}
+            <div className="relative flex flex-col items-center">
+              <div className="relative">
+                <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-gold via-gold-soft to-maroon blur-md opacity-70" />
+                <img
+                  src={t.avatar}
+                  alt={t.n}
+                  loading="lazy"
+                  decoding="async"
+                  width={72}
+                  height={72}
+                  className="relative h-16 w-16 md:h-[72px] md:w-[72px] rounded-full object-cover border-2 border-gold/60 shadow-[0_10px_30px_-10px_oklch(0.78_0.13_82/0.7)]"
+                />
+                <span className="absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br from-gold to-gold-soft text-ink shadow-lg" aria-label="Verified review">
+                  <ShieldCheck size={13} />
+                </span>
+              </div>
+              <span className="mt-3 inline-flex items-center gap-1.5 rounded-full glass px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-gold-soft">
+                <ShieldCheck size={11} /> Verified Review
+              </span>
             </div>
-            <p className="font-display text-2xl md:text-3xl leading-snug italic text-foreground/90">
-              “{TESTIMONIALS[i].q}”
+
+            {/* Animated stars */}
+            <div className="mt-5 flex justify-center gap-1 text-gold">
+              {[...Array(5)].map((_, k) => (
+                <motion.span
+                  key={k}
+                  initial={{ opacity: 0, scale: 0.4, rotate: -30 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.15 + k * 0.09, type: "spring", stiffness: 260, damping: 14 }}
+                >
+                  <Star size={18} fill="currentColor" />
+                </motion.span>
+              ))}
+            </div>
+
+            <p className="relative mt-5 font-display text-xl md:text-2xl lg:text-3xl leading-snug italic text-foreground/90">
+              “{t.q}”
             </p>
-            <div className="mt-6 text-sm text-gold-soft uppercase tracking-[0.3em]">— {TESTIMONIALS[i].n}</div>
+            <div className="mt-5 text-sm text-gold-soft uppercase tracking-[0.3em]">— {t.n}</div>
+            {t.city && (
+              <div className="mt-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">{t.city}</div>
+            )}
           </motion.blockquote>
         </AnimatePresence>
       </div>
+
       <div className="mt-8 flex justify-center gap-2">
         {TESTIMONIALS.map((_, k) => (
           <button
             key={k}
             onClick={() => setI(k)}
             aria-label={`Testimonial ${k + 1}`}
-            className={`h-1.5 rounded-full transition-all ${k === i ? "w-10 bg-gold" : "w-4 bg-white/20"}`}
+            className={`h-1.5 rounded-full transition-all ${k === i ? "w-10 bg-gold" : "w-4 bg-white/20 hover:bg-white/40"}`}
           />
         ))}
       </div>
