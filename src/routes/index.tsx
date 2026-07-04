@@ -70,7 +70,10 @@ export const Route = createFileRoute("/")({
       { property: "og:url", content: "/" },
       { name: "twitter:image", content: heroBiryani },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [
+      { rel: "canonical", href: "/" },
+      { rel: "preload", as: "image", href: heroBiryani, fetchpriority: "high" },
+    ],
     scripts: [
       {
         type: "application/ld+json",
@@ -123,6 +126,7 @@ function Index() {
   const [mouse, setMouse] = useState({ x: -200, y: -200 });
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [activeSection, setActiveSection] = useState("home");
   const heroRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress: pageProgress } = useScroll();
@@ -149,6 +153,26 @@ function Index() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("mousemove", onMove);
     };
+  }, []);
+
+  // Active section highlighting via IntersectionObserver
+  useEffect(() => {
+    const ids = ["home", "about", "menu", "gallery", "catering", "business", "contact"];
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter((n): n is HTMLElement => Boolean(n));
+    if (!sections.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible?.target.id) setActiveSection(visible.target.id);
+      },
+      { rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
+    );
+    sections.forEach((s) => io.observe(s));
+    return () => io.disconnect();
   }, []);
 
   const navLinks = [
@@ -239,16 +263,28 @@ function Index() {
           </a>
 
           <div className="hidden lg:flex items-center gap-7">
-            {navLinks.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className="group relative text-xs uppercase tracking-widest text-foreground/80 hover:text-gold transition-colors"
-              >
-                {l.label}
-                <span className="absolute -bottom-1 left-0 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
-              </a>
-            ))}
+            {navLinks.map((l) => {
+              const id = l.href.slice(1);
+              const isActive = activeSection === id;
+              return (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  className={`group relative text-xs uppercase tracking-widest transition-colors ${
+                    isActive ? "text-gold" : "text-foreground/80 hover:text-gold"
+                  }`}
+                >
+                  {l.label}
+                  <motion.span
+                    className="absolute -bottom-1.5 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent origin-center"
+                    initial={false}
+                    animate={{ scaleX: isActive ? 1 : 0, opacity: isActive ? 1 : 0 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  />
+                  <span className="pointer-events-none absolute -bottom-1.5 left-0 h-[2px] w-0 bg-gold transition-all duration-300 group-hover:w-full" />
+                </a>
+              );
+            })}
           </div>
 
           <a href="#contact" className="hidden lg:inline-flex btn-gold px-6 py-2.5 rounded-full text-sm font-semibold">
@@ -256,7 +292,18 @@ function Index() {
           </a>
 
           <button className="lg:hidden text-gold p-2" onClick={() => setMenuOpen((o) => !o)} aria-label="Menu">
-            {menuOpen ? <X size={26} /> : <Menu size={26} />}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={menuOpen ? "x" : "m"}
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="inline-flex"
+              >
+                {menuOpen ? <X size={26} /> : <Menu size={26} />}
+              </motion.span>
+            </AnimatePresence>
           </button>
         </div>
 
@@ -266,26 +313,45 @@ function Index() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               className="lg:hidden overflow-hidden glass-strong"
             >
-              <div className="flex flex-col px-6 py-6 gap-4">
-                {navLinks.map((l, i) => (
-                  <motion.a
-                    key={l.href}
-                    href={l.href}
-                    onClick={() => setMenuOpen(false)}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="text-lg uppercase tracking-widest text-foreground/90 hover:text-gold border-b border-white/5 pb-3"
-                  >
-                    {l.label}
-                  </motion.a>
-                ))}
-                <a href="#contact" onClick={() => setMenuOpen(false)} className="btn-gold rounded-full px-6 py-3 text-center font-semibold mt-2">
+              <motion.div
+                className="flex flex-col px-6 py-6 gap-1"
+                initial="hidden"
+                animate="visible"
+                variants={{ visible: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } } }}
+              >
+                {navLinks.map((l) => {
+                  const id = l.href.slice(1);
+                  const isActive = activeSection === id;
+                  return (
+                    <motion.a
+                      key={l.href}
+                      href={l.href}
+                      onClick={() => setMenuOpen(false)}
+                      variants={{
+                        hidden: { opacity: 0, x: -30 },
+                        visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+                      }}
+                      className={`flex items-center justify-between text-lg uppercase tracking-widest border-b border-white/5 py-3 transition-colors ${
+                        isActive ? "text-gold" : "text-foreground/90 hover:text-gold"
+                      }`}
+                    >
+                      <span>{l.label}</span>
+                      {isActive && <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_12px_2px_oklch(0.78_0.13_82/0.7)]" />}
+                    </motion.a>
+                  );
+                })}
+                <motion.a
+                  href="#contact"
+                  onClick={() => setMenuOpen(false)}
+                  variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                  className="btn-gold rounded-full px-6 py-3 text-center font-semibold mt-4"
+                >
                   Reserve Table
-                </a>
-              </div>
+                </motion.a>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -439,6 +505,7 @@ function Index() {
               src={interior}
               alt="Ustaads restaurant interior"
               loading="lazy"
+              decoding="async"
               width={1280}
               height={1024}
               className="relative rounded-3xl border border-gold/20 shadow-[var(--shadow-elevated)] w-full h-[440px] md:h-[560px] object-cover"
@@ -540,6 +607,7 @@ function Index() {
                 src={g.src}
                 alt={g.alt}
                 loading="lazy"
+              decoding="async"
                 className="w-full transition-transform duration-700 group-hover:scale-110"
                 style={{ aspectRatio: g.ratio }}
               />
@@ -646,6 +714,7 @@ function Index() {
               src={catering}
               alt="Ustaads catering setup"
               loading="lazy"
+              decoding="async"
               width={1280}
               height={1024}
               className="rounded-3xl border border-gold/20 shadow-[var(--shadow-elevated)] w-full h-[440px] md:h-[540px] object-cover"
@@ -1080,6 +1149,7 @@ function FoodCard({ item, index }: { item: (typeof MENU)[number]; index: number 
           src={item.img}
           alt={item.name}
           loading="lazy"
+              decoding="async"
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
@@ -1196,10 +1266,13 @@ function StatItem({ n, s, l, divide, active }: { n: number; s: string; l: string
 
 function TestimonialsSection() {
   const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
   useEffect(() => {
-    const id = setInterval(() => setI((v) => (v + 1) % TESTIMONIALS.length), 5000);
+    if (paused) return;
+    const id = setInterval(() => setI((v) => (v + 1) % TESTIMONIALS.length), 5500);
     return () => clearInterval(id);
-  }, []);
+  }, [paused]);
+  const t = TESTIMONIALS[i];
   return (
     <Section id="reviews">
       <Heading eyebrow="Guest Stories" title="Loved by 10,000+ diners" />
@@ -1216,33 +1289,77 @@ function TestimonialsSection() {
         </div>
       </div>
 
-      <div className="mt-14 relative max-w-3xl mx-auto h-64">
+      <div
+        className="mt-14 relative max-w-3xl mx-auto min-h-[22rem] md:min-h-[20rem]"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
         <AnimatePresence mode="wait">
           <motion.blockquote
             key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.7 }}
-            className="glass-strong rounded-3xl p-10 text-center absolute inset-0"
+            initial={{ opacity: 0, y: 30, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -30, scale: 0.97 }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            className="glass-strong rounded-3xl p-8 md:p-10 text-center relative overflow-hidden"
           >
-            <div className="flex justify-center gap-1 text-gold mb-4">
-              {[...Array(5)].map((_, k) => <Star key={k} size={16} fill="currentColor" />)}
+            {/* subtle radial gold glow */}
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,oklch(0.78_0.13_82/0.15),transparent_60%)]" />
+
+            {/* Avatar + verified */}
+            <div className="relative flex flex-col items-center">
+              <div className="relative">
+                <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-gold via-gold-soft to-maroon blur-md opacity-70" />
+                <img
+                  src={t.avatar}
+                  alt={t.n}
+                  loading="lazy"
+                  decoding="async"
+                  width={72}
+                  height={72}
+                  className="relative h-16 w-16 md:h-[72px] md:w-[72px] rounded-full object-cover border-2 border-gold/60 shadow-[0_10px_30px_-10px_oklch(0.78_0.13_82/0.7)]"
+                />
+                <span className="absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br from-gold to-gold-soft text-ink shadow-lg" aria-label="Verified review">
+                  <ShieldCheck size={13} />
+                </span>
+              </div>
+              <span className="mt-3 inline-flex items-center gap-1.5 rounded-full glass px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-gold-soft">
+                <ShieldCheck size={11} /> Verified Review
+              </span>
             </div>
-            <p className="font-display text-2xl md:text-3xl leading-snug italic text-foreground/90">
-              “{TESTIMONIALS[i].q}”
+
+            {/* Animated stars */}
+            <div className="mt-5 flex justify-center gap-1 text-gold">
+              {[...Array(5)].map((_, k) => (
+                <motion.span
+                  key={k}
+                  initial={{ opacity: 0, scale: 0.4, rotate: -30 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.15 + k * 0.09, type: "spring", stiffness: 260, damping: 14 }}
+                >
+                  <Star size={18} fill="currentColor" />
+                </motion.span>
+              ))}
+            </div>
+
+            <p className="relative mt-5 font-display text-xl md:text-2xl lg:text-3xl leading-snug italic text-foreground/90">
+              “{t.q}”
             </p>
-            <div className="mt-6 text-sm text-gold-soft uppercase tracking-[0.3em]">— {TESTIMONIALS[i].n}</div>
+            <div className="mt-5 text-sm text-gold-soft uppercase tracking-[0.3em]">— {t.n}</div>
+            {t.city && (
+              <div className="mt-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">{t.city}</div>
+            )}
           </motion.blockquote>
         </AnimatePresence>
       </div>
+
       <div className="mt-8 flex justify-center gap-2">
         {TESTIMONIALS.map((_, k) => (
           <button
             key={k}
             onClick={() => setI(k)}
             aria-label={`Testimonial ${k + 1}`}
-            className={`h-1.5 rounded-full transition-all ${k === i ? "w-10 bg-gold" : "w-4 bg-white/20"}`}
+            className={`h-1.5 rounded-full transition-all ${k === i ? "w-10 bg-gold" : "w-4 bg-white/20 hover:bg-white/40"}`}
           />
         ))}
       </div>
@@ -1255,13 +1372,13 @@ function TestimonialsSection() {
 const MENU = [
   { name: "Chicken Dum Biryani", cat: "Biryani", price: "₹225", img: heroBiryani, desc: "Slow-cooked basmati, tender chicken, saffron and secret spices, sealed with dough.", veg: false, spice: 2, bestseller: true, chefSpecial: true },
   { name: "Mutton Biryani", cat: "Biryani", price: "₹350", img: muttonBiryani, desc: "Premium mutton dum-cooked with aromatic long-grain rice — a Hyderabadi classic.", veg: false, spice: 3, bestseller: true, chefSpecial: false },
-  { name: "Angara Kebab", cat: "Starter", price: "₹280", img: kebabs, desc: "Charcoal-grilled skewers, smoky and succulent with a hint of yoghurt marinade.", veg: false, spice: 2, bestseller: false, chefSpecial: true },
-  { name: "Chicken 65", cat: "Starter", price: "₹240", img: chicken65, desc: "Crispy, spicy, tangy — Hyderabad's most iconic bar bite, done right.", veg: false, spice: 3, bestseller: true, chefSpecial: false },
-  { name: "Butter Chicken", cat: "Main", price: "₹320", img: butterChicken, desc: "Silken tomato-cream gravy, tandoor-charred chicken, finished with kasuri methi.", veg: false, spice: 1, bestseller: false, chefSpecial: false },
-  { name: "Paneer Tikka", cat: "Starter", price: "₹260", img: paneerTikka, desc: "Marinated cottage cheese, chargrilled to smoky perfection with bell peppers.", veg: true, spice: 2, bestseller: false, chefSpecial: false },
+  { name: "Angara Kebab", cat: "Starters", price: "₹280", img: kebabs, desc: "Charcoal-grilled skewers, smoky and succulent with a hint of yoghurt marinade.", veg: false, spice: 2, bestseller: false, chefSpecial: true },
+  { name: "Chicken 65", cat: "Starters", price: "₹240", img: chicken65, desc: "Crispy, spicy, tangy — Hyderabad's most iconic bar bite, done right.", veg: false, spice: 3, bestseller: true, chefSpecial: false },
+  { name: "Butter Chicken", cat: "Main Course", price: "₹320", img: butterChicken, desc: "Silken tomato-cream gravy, tandoor-charred chicken, finished with kasuri methi.", veg: false, spice: 1, bestseller: false, chefSpecial: false },
+  { name: "Paneer Tikka", cat: "Starters", price: "₹260", img: paneerTikka, desc: "Marinated cottage cheese, chargrilled to smoky perfection with bell peppers.", veg: true, spice: 2, bestseller: false, chefSpecial: false },
   { name: "Veg Dum Biryani", cat: "Biryani", price: "₹200", img: heroBiryani, desc: "Fragrant vegetables and basmati, layered and dum-sealed — vegetarian royalty.", veg: true, spice: 2, bestseller: false, chefSpecial: false },
-  { name: "Murgh Musallam", cat: "Main", price: "₹420", img: butterChicken, desc: "Whole chicken slow-braised in Mughlai spices — a royal centrepiece.", veg: false, spice: 2, bestseller: false, chefSpecial: true },
-  { name: "Qubani Ka Meetha", cat: "Dessert", price: "₹160", img: qubani, desc: "Traditional Hyderabadi apricot dessert with fresh cream — heritage on a plate.", veg: true, spice: 0, bestseller: true, chefSpecial: false },
+  { name: "Murgh Musallam", cat: "Main Course", price: "₹420", img: butterChicken, desc: "Whole chicken slow-braised in Mughlai spices — a royal centrepiece.", veg: false, spice: 2, bestseller: false, chefSpecial: true },
+  { name: "Qubani Ka Meetha", cat: "Desserts", price: "₹160", img: qubani, desc: "Traditional Hyderabadi apricot dessert with fresh cream — heritage on a plate.", veg: true, spice: 0, bestseller: true, chefSpecial: false },
 ];
 
 const WHY = [
@@ -1286,10 +1403,30 @@ const GALLERY = [
 ];
 
 const TESTIMONIALS = [
-  { q: "Best Hyderabadi biryani in the city. The dum aroma alone is worth the visit.", n: "Rahul S." },
-  { q: "Excellent taste and amazing service. Catered our wedding for 800 guests flawlessly.", n: "Priya K." },
-  { q: "Highly recommended for family dining. The kebabs are unreal — proper charcoal work.", n: "Aditya M." },
-  { q: "Ordered for a corporate event of 200 people. On time, hot, and every plate was empty.", n: "Neha R." },
+  {
+    q: "Best Hyderabadi biryani in the city. The dum aroma alone is worth the visit.",
+    n: "Rahul S.",
+    city: "Hyderabad",
+    avatar: "https://i.pravatar.cc/160?img=15",
+  },
+  {
+    q: "Excellent taste and amazing service. Catered our wedding for 800 guests flawlessly.",
+    n: "Priya K.",
+    city: "Secunderabad",
+    avatar: "https://i.pravatar.cc/160?img=45",
+  },
+  {
+    q: "Highly recommended for family dining. The kebabs are unreal — proper charcoal work.",
+    n: "Aditya M.",
+    city: "Gachibowli",
+    avatar: "https://i.pravatar.cc/160?img=12",
+  },
+  {
+    q: "Ordered for a corporate event of 200 people. On time, hot, and every plate was empty.",
+    n: "Neha R.",
+    city: "Banjara Hills",
+    avatar: "https://i.pravatar.cc/160?img=32",
+  },
 ];
 
 const BUSINESS_FEATURES = [
