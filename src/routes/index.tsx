@@ -263,16 +263,28 @@ function Index() {
           </a>
 
           <div className="hidden lg:flex items-center gap-7">
-            {navLinks.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className="group relative text-xs uppercase tracking-widest text-foreground/80 hover:text-gold transition-colors"
-              >
-                {l.label}
-                <span className="absolute -bottom-1 left-0 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
-              </a>
-            ))}
+            {navLinks.map((l) => {
+              const id = l.href.slice(1);
+              const isActive = activeSection === id;
+              return (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  className={`group relative text-xs uppercase tracking-widest transition-colors ${
+                    isActive ? "text-gold" : "text-foreground/80 hover:text-gold"
+                  }`}
+                >
+                  {l.label}
+                  <motion.span
+                    className="absolute -bottom-1.5 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent origin-center"
+                    initial={false}
+                    animate={{ scaleX: isActive ? 1 : 0, opacity: isActive ? 1 : 0 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  />
+                  <span className="pointer-events-none absolute -bottom-1.5 left-0 h-[2px] w-0 bg-gold transition-all duration-300 group-hover:w-full" />
+                </a>
+              );
+            })}
           </div>
 
           <a href="#contact" className="hidden lg:inline-flex btn-gold px-6 py-2.5 rounded-full text-sm font-semibold">
@@ -280,7 +292,18 @@ function Index() {
           </a>
 
           <button className="lg:hidden text-gold p-2" onClick={() => setMenuOpen((o) => !o)} aria-label="Menu">
-            {menuOpen ? <X size={26} /> : <Menu size={26} />}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={menuOpen ? "x" : "m"}
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="inline-flex"
+              >
+                {menuOpen ? <X size={26} /> : <Menu size={26} />}
+              </motion.span>
+            </AnimatePresence>
           </button>
         </div>
 
@@ -290,26 +313,45 @@ function Index() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               className="lg:hidden overflow-hidden glass-strong"
             >
-              <div className="flex flex-col px-6 py-6 gap-4">
-                {navLinks.map((l, i) => (
-                  <motion.a
-                    key={l.href}
-                    href={l.href}
-                    onClick={() => setMenuOpen(false)}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="text-lg uppercase tracking-widest text-foreground/90 hover:text-gold border-b border-white/5 pb-3"
-                  >
-                    {l.label}
-                  </motion.a>
-                ))}
-                <a href="#contact" onClick={() => setMenuOpen(false)} className="btn-gold rounded-full px-6 py-3 text-center font-semibold mt-2">
+              <motion.div
+                className="flex flex-col px-6 py-6 gap-1"
+                initial="hidden"
+                animate="visible"
+                variants={{ visible: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } } }}
+              >
+                {navLinks.map((l) => {
+                  const id = l.href.slice(1);
+                  const isActive = activeSection === id;
+                  return (
+                    <motion.a
+                      key={l.href}
+                      href={l.href}
+                      onClick={() => setMenuOpen(false)}
+                      variants={{
+                        hidden: { opacity: 0, x: -30 },
+                        visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+                      }}
+                      className={`flex items-center justify-between text-lg uppercase tracking-widest border-b border-white/5 py-3 transition-colors ${
+                        isActive ? "text-gold" : "text-foreground/90 hover:text-gold"
+                      }`}
+                    >
+                      <span>{l.label}</span>
+                      {isActive && <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_12px_2px_oklch(0.78_0.13_82/0.7)]" />}
+                    </motion.a>
+                  );
+                })}
+                <motion.a
+                  href="#contact"
+                  onClick={() => setMenuOpen(false)}
+                  variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                  className="btn-gold rounded-full px-6 py-3 text-center font-semibold mt-4"
+                >
                   Reserve Table
-                </a>
-              </div>
+                </motion.a>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
