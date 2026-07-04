@@ -126,6 +126,7 @@ function Index() {
   const [mouse, setMouse] = useState({ x: -200, y: -200 });
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [activeSection, setActiveSection] = useState("home");
   const heroRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress: pageProgress } = useScroll();
