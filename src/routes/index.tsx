@@ -505,6 +505,7 @@ function Index() {
               src={interior}
               alt="Ustaads restaurant interior"
               loading="lazy"
+              decoding="async"
               width={1280}
               height={1024}
               className="relative rounded-3xl border border-gold/20 shadow-[var(--shadow-elevated)] w-full h-[440px] md:h-[560px] object-cover"
@@ -606,6 +607,7 @@ function Index() {
                 src={g.src}
                 alt={g.alt}
                 loading="lazy"
+              decoding="async"
                 className="w-full transition-transform duration-700 group-hover:scale-110"
                 style={{ aspectRatio: g.ratio }}
               />
@@ -712,6 +714,7 @@ function Index() {
               src={catering}
               alt="Ustaads catering setup"
               loading="lazy"
+              decoding="async"
               width={1280}
               height={1024}
               className="rounded-3xl border border-gold/20 shadow-[var(--shadow-elevated)] w-full h-[440px] md:h-[540px] object-cover"
@@ -812,6 +815,7 @@ function Index() {
               <iframe
                 title="Ustaads location"
                 loading="lazy"
+              decoding="async"
                 referrerPolicy="no-referrer-when-downgrade"
                 src="https://www.google.com/maps?q=Himayat+Sagar+Road+Hyderabad&output=embed"
                 className="h-full w-full pointer-events-none"
@@ -1146,6 +1150,7 @@ function FoodCard({ item, index }: { item: (typeof MENU)[number]; index: number 
           src={item.img}
           alt={item.name}
           loading="lazy"
+              decoding="async"
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
