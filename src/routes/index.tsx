@@ -815,7 +815,6 @@ function Index() {
               <iframe
                 title="Ustaads location"
                 loading="lazy"
-              decoding="async"
                 referrerPolicy="no-referrer-when-downgrade"
                 src="https://www.google.com/maps?q=Himayat+Sagar+Road+Hyderabad&output=embed"
                 className="h-full w-full pointer-events-none"
